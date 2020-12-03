@@ -205,8 +205,8 @@ class DataBundle:
         r"""
         将DataBundle中所有的DataSet中名为field_name的Field复制一份并命名为叫new_field_name.
 
-        :param str field_name:
-        :param str new_field_name:
+        :param str field_name:  eg: 'raw_chars'
+        :param str new_field_name:  eg: 'chars'
         :param bool ignore_miss_dataset: 当某个field名称在某个dataset不存在时，如果为True，则直接忽略该DataSet;
             如果为False，则报错
         :return: self

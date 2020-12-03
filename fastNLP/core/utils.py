@@ -572,7 +572,7 @@ def _check_arg_dict_list(func, args):
 
 def _get_func_signature(func):
     r"""
-
+    给定一个函数或方法，返回其签名。
     Given a function or method, return its signature.
     For example:
     

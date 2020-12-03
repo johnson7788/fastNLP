@@ -447,7 +447,7 @@ class Trainer(object):
         metrics = _prepare_metrics(metrics)
 
         # parse metric_key
-        # increase_better is True. It means the exp result gets better if the indicator increases.
+        # increase_better is True. 这意味着如果指标增加，exp结果会变得更好。
         # It is true by default.
         self.increase_better = True
         if metric_key is not None:
@@ -498,7 +498,7 @@ class Trainer(object):
             check_code_level = -1  # 强制跳过校验
         else:
             raise TypeError("train_data type {} not support".format(type(train_data)))
-
+        #设置模型为train
         model.train()
         self.model = _move_model_to_device(model, device=device)
         if _model_contains_inner_module(self.model):
