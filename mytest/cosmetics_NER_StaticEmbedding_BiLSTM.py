@@ -87,7 +87,24 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
         print("句子:", con)
         print("真实标签:", la)
         print("预测标签:", pre)
-        results.append({'content':con, "label":la, "predict":pre})
+        words = []
+        word = ""
+        for idx, p in enumerate(predict):
+            if p.startswith('B-'):
+                if word != "":
+                    #说明上一个单词已经是一个完整的词了, 加到词表，然后重置
+                    words.append(word)
+                    word = ""
+                word += content[idx]
+            elif p.startswith('I-'):
+                word += content[idx]
+            else:
+                #如果单词存在，那么加到词语表里面
+                if word:
+                    words.append(word)
+                    word = ""
+        print("真实的词:", words)
+        results.append({'content':con, "words":words, "predict":pre})
     if save_excel:
         import pandas as pd
         df = pd.DataFrame(results)

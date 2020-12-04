@@ -49,12 +49,58 @@ def do_train(data_bundle, model, metric):
                       dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device, save_path="output")
     trainer.train()
 
-def do_test(data_bundle,model, metric, model_path):
+def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
+    # ## 进行测试
+    # 训练结束之后过，可以通过 Tester 测试其在测试集上的性能
     from fastNLP import Tester
     from fastNLP.io import ModelLoader
-    model = ModelLoader.load_pytorch(model,model_path)
+    model = ModelLoader.load_pytorch_model(model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
-    tester.test()
+    eval_results = tester.test()
+    id2labels = data_bundle.vocabs['target'].idx2word
+    test_contents = data_bundle.get_dataset('test').get_field("raw_chars").content
+    true_labels = data_bundle.get_dataset('test').get_field("target").content
+    predict_ids = eval_results['predict_results']
+    results = []
+    for content, true_id, predict_id in zip(test_contents, true_labels, predict_ids):
+        label = list(map(lambda x: id2labels[x], true_id))
+        predict = list(map(lambda x: id2labels[x], predict_id))
+        if len(content) != len(label):
+            print("句子内容和真实label长度不匹配，错误")
+            print(content)
+            print(label)
+            break
+        predict = predict[:len(label)]
+        con = " ".join(content)
+        la = " ".join(label)
+        pre = " ".join(predict)
+        print("句子:", con)
+        print("真实标签:", la)
+        print("预测标签:", pre)
+        words = []
+        word = ""
+        for idx, p in enumerate(predict):
+            if p.startswith('B-'):
+                if word != "":
+                    #说明上一个单词已经是一个完整的词了, 加到词表，然后重置
+                    words.append(word)
+                    word = ""
+                word += content[idx]
+            elif p.startswith('I-'):
+                word += content[idx]
+            else:
+                #如果单词存在，那么加到词语表里面
+                if word:
+                    words.append(word)
+                    word = ""
+        print("真实的词:", words)
+        results.append({'content':con, "words":words, "predict":pre})
+    if save_excel:
+        import pandas as pd
+        df = pd.DataFrame(results)
+        writer = pd.ExcelWriter(save_excel)
+        df.to_excel(writer)
+        writer.save()
 
 if __name__ == '__main__':
     data_bundle = load_data()
