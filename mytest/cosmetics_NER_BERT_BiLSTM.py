@@ -43,12 +43,11 @@ def do_train(data_bundle, model, metric):
     """
     from torch.optim import Adam
     from fastNLP import LossInForward
+    from fastNLP import Trainer
+    import torch
 
     optimizer = Adam(model.parameters(), lr=2e-5)
     loss = LossInForward()
-
-    from fastNLP import Trainer
-    import torch
 
     device = 0 if torch.cuda.is_available() else 'cpu'
     trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,n_epochs=10,
