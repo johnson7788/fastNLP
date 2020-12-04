@@ -54,6 +54,16 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
     # 训练结束之后过，可以通过 Tester 测试其在测试集上的性能
     from fastNLP import Tester
     from fastNLP.io import ModelLoader
+    import os
+    #如果是一个目录，只用其中的一个模型
+    if os.path.isdir(model_path):
+        models_file = os.listdir(model_path)
+        if len(models_file) != 1:
+            print("模型文件不仅一个，请手动给定")
+            import sys
+            sys.exit(1)
+        else:
+            model_path = models_file[0]
     model = ModelLoader.load_pytorch_model(model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
     eval_results = tester.test()
@@ -105,5 +115,5 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
 if __name__ == '__main__':
     data_bundle = load_data()
     model, metric = build_model_metric(data_bundle)
-    do_train(data_bundle, model, metric)
-    # do_test(data_bundle, model, metric, model_path="output")
+    # do_train(data_bundle, model, metric)
+    do_test(data_bundle, model, metric, model_path="output")
