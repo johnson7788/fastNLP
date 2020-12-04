@@ -45,7 +45,7 @@ def do_train(data_bundle, model, metric):
     import torch
 
     device = 0 if torch.cuda.is_available() else 'cpu'
-    trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,
+    trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,n_epochs=10,
                       dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device, save_path="output")
     trainer.train()
 
