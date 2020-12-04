@@ -159,6 +159,8 @@ class Tester(object):
         self._mode(network, is_test=True)
         data_iterator = self.data_iterator
         eval_results = {}
+        #存储预测结果，然后把结果放到eval_results中
+        predict_results = []
         try:
             with torch.no_grad():
                 if not self.use_tqdm:
@@ -172,10 +174,14 @@ class Tester(object):
 
                     for batch_x, batch_y in data_iterator:
                         _move_dict_value_to_device(batch_x, batch_y, device=self._model_device)
+                        # 返回字典{'pred'
                         pred_dict = self._data_forward(self._predict_func, batch_x)
                         if not isinstance(pred_dict, dict):
                             raise TypeError(f"The return value of {_get_func_signature(self._predict_func)} "
                                             f"must be `dict`, got {type(pred_dict)}.")
+                        # 把预测结果加入到predict_results
+                        predicts = [p.tolist() for p in pred_dict['pred']]
+                        predict_results.extend(predicts)
                         for metric in self.metrics:
                             metric(pred_dict, batch_y)
 
@@ -203,6 +209,8 @@ class Tester(object):
             self._mode(network, is_test=False)
         if self.verbose >= 1:
             logger.info("[tester] \n{}".format(self._format_eval_results(eval_results)))
+        # 把predict_results 加入到eval_results
+        eval_results['predict_results'] = predict_results
         return eval_results
     
     def _mode(self, model, is_test=False):
@@ -231,6 +239,8 @@ class Tester(object):
         """
         _str = ''
         for metric_name, metric_result in results.items():
+            if metric_name == 'predict_results':
+                continue
             _str += metric_name + ': '
             _str += ", ".join([str(key) + "=" + str(value) for key, value in metric_result.items()])
             _str += '\n'
