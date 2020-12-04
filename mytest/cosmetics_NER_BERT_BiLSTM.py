@@ -34,7 +34,13 @@ def build_model_metric(data_bundle):
     return model,metric
 
 def do_train(data_bundle, model, metric):
-
+    """
+    BERT 模型效果比BiLSTM会好一些
+    :param data_bundle:
+    :param model:
+    :param metric:
+    :return:
+    """
     from torch.optim import Adam
     from fastNLP import LossInForward
 

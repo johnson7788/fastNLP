@@ -12,6 +12,11 @@ def load_data():
 
 
 def build_model_metric(data_bundle):
+    """
+    BiLSTMCRF 很容易过拟合，不太推荐使用，效果不太好
+    :param data_bundle:
+    :return:
+    """
     # ## 模型构建
     #
     # 首先选择需要使用的Embedding类型。关于Embedding的相关说明可以参见《使用Embedding模块将文本转成向量》。 在这里我们使用通过word2vec预训练的中文汉字embedding。
@@ -22,8 +27,6 @@ def build_model_metric(data_bundle):
     embed = StaticEmbedding(vocab=data_bundle.get_vocab('chars'), model_dir_or_name='cn-char-fastnlp-100d')
 
     # 选择好Embedding之后，我们可以使用fastNLP中自带的 fastNLP.models.BiLSTMCRF 作为模型。
-
-    # In[3]:
 
     from fastNLP.models import BiLSTMCRF
 
