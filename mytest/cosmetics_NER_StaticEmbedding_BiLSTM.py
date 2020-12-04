@@ -73,7 +73,7 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
             import sys
             sys.exit(1)
         else:
-            model_path = models_file[0]
+            model_path = os.path.join(model_path,models_file[0])
     model = ModelLoader.load_pytorch_model(model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
     eval_results = tester.test()
