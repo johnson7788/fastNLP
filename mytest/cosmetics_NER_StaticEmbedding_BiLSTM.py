@@ -59,18 +59,19 @@ def do_train(data_bundle, model, metric):
                       dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device, save_path="output", n_epochs=50)
     trainer.train()
 
-def do_test(data_bundle,model, metric):
+def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
     # ## 进行测试
     # 训练结束之后过，可以通过 Tester 测试其在测试集上的性能
-
     from fastNLP import Tester
-
+    from fastNLP.io import ModelLoader
+    model = ModelLoader.load_pytorch_model(model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
     eval_results = tester.test()
     id2labels = data_bundle.vocabs['target'].idx2word
     test_contents = data_bundle.get_dataset('test').get_field("raw_chars").content
     true_labels = data_bundle.get_dataset('test').get_field("target").content
     predict_ids = eval_results['predict_results']
+    results = []
     for content, true_id, predict_id in zip(test_contents, true_labels, predict_ids):
         label = list(map(lambda x: id2labels[x], true_id))
         predict = list(map(lambda x: id2labels[x], predict_id))
@@ -80,13 +81,23 @@ def do_test(data_bundle,model, metric):
             print(label)
             break
         predict = predict[:len(label)]
-        print("句子:", " ".join(content))
-        print("真实标签:", " ".join(label))
-        print("预测标签:", " ".join(predict))
+        con = " ".join(content)
+        la = " ".join(label)
+        pre = " ".join(predict)
+        print("句子:", con)
+        print("真实标签:", la)
+        print("预测标签:", pre)
+        results.append({'content':con, "label":la, "predict":pre})
+    if save_excel:
+        import pandas as pd
+        df = pd.DataFrame(results)
+        writer = pd.ExcelWriter(save_excel)
+        df.to_excel(writer)
+        writer.save()
 
 
 if __name__ == '__main__':
     data_bundle = load_data()
     model, metric = build_model_metric(data_bundle)
     # do_train(data_bundle, model, metric)
-    do_test(data_bundle, model, metric)
+    do_test(data_bundle, metric, model_path="output/best_BiLSTMCRF_f_2020-12-04-16-55-05-725458")

@@ -49,9 +49,10 @@ def do_train(data_bundle, model, metric):
                       dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device, save_path="output")
     trainer.train()
 
-def do_test(data_bundle,model, metric):
+def do_test(data_bundle,model, metric, model_path):
     from fastNLP import Tester
-
+    from fastNLP.io import ModelLoader
+    model = ModelLoader.load_pytorch(model,model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
     tester.test()
 
@@ -59,4 +60,4 @@ if __name__ == '__main__':
     data_bundle = load_data()
     model, metric = build_model_metric(data_bundle)
     do_train(data_bundle, model, metric)
-    # do_test(data_bundle, model, metric)
+    # do_test(data_bundle, model, metric, model_path="output")
