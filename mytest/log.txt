@@ -1,0 +1,14 @@
+BiLSTM
+In Epoch:6/Step:192, got best dev performance:
+SpanFPreRecMetric: f=0.912752, pre=0.918919, rec=0.906667
+Evaluate data in 0.09 seconds!
+[tester]
+SpanFPreRecMetric: f=0.908451, pre=0.908451, rec=0.908451
+
+
+BERT+BiLSTM模型
+got best dev performance:
+SpanFPreRecMetric: f=0.947368, pre=0.935065, rec=0.96
+Evaluate data in 0.48 seconds!
+[tester]
+SpanFPreRecMetric: f=0.883562, pre=0.86, rec=0.908451
