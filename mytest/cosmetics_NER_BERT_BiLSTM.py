@@ -32,7 +32,7 @@ loss = LossInForward()
 from fastNLP import Trainer
 import torch
 
-device = 5 if torch.cuda.is_available() else 'cpu'
+device = 0 if torch.cuda.is_available() else 'cpu'
 trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,
                   dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device)
 trainer.train()
