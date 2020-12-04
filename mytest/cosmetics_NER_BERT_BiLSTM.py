@@ -116,4 +116,4 @@ if __name__ == '__main__':
     data_bundle = load_data()
     model, metric = build_model_metric(data_bundle)
     # do_train(data_bundle, model, metric)
-    do_test(data_bundle, model, metric, model_path="output")
+    do_test(data_bundle, metric, model_path="output")
