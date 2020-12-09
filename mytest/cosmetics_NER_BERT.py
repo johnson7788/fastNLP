@@ -11,6 +11,7 @@ from fastNLP.embeddings.utils import get_embeddings
 from fastNLP.modules import decoder, encoder
 from fastNLP.core.const import Const as C
 
+
 class MySeqLabeling(BaseModel):
     r"""
     一个基础的Sequence labeling的模型。
@@ -102,7 +103,6 @@ def load_data():
 
 
 def build_model_metric(data_bundle):
-
     from fastNLP.embeddings import BertEmbedding
     from fastNLP.models import BiLSTMCRF
     from fastNLP import SpanFPreRecMetric
@@ -112,7 +112,8 @@ def build_model_metric(data_bundle):
 
     metric = SpanFPreRecMetric(tag_vocab=data_bundle.get_vocab('target'))
 
-    return model,metric
+    return model, metric
+
 
 def do_train(data_bundle, model, metric):
     """
@@ -131,9 +132,11 @@ def do_train(data_bundle, model, metric):
     loss = LossInForward()
 
     device = 0 if torch.cuda.is_available() else 'cpu'
-    trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,n_epochs=10,
+    trainer = Trainer(data_bundle.get_dataset('train'), model, loss=loss, optimizer=optimizer, batch_size=12,
+                      n_epochs=10,
                       dev_data=data_bundle.get_dataset('dev'), metrics=metric, device=device, save_path="output")
     trainer.train()
+
 
 def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
     # ## 进行测试
@@ -141,7 +144,7 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
     from fastNLP import Tester
     from fastNLP.io import ModelLoader
     import os
-    #如果是一个目录，只用其中的一个模型
+    # 如果是一个目录，只用其中的一个模型
     if os.path.isdir(model_path):
         models_file = os.listdir(model_path)
         if len(models_file) != 1:
@@ -149,7 +152,7 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
             import sys
             sys.exit(1)
         else:
-            model_path = os.path.join(model_path,models_file[0])
+            model_path = os.path.join(model_path, models_file[0])
     model = ModelLoader.load_pytorch_model(model_path)
     tester = Tester(data_bundle.get_dataset('test'), model, metrics=metric)
     eval_results = tester.test()
@@ -178,25 +181,26 @@ def do_test(data_bundle, metric, model_path, save_excel="test.xlsx"):
         for idx, p in enumerate(predict):
             if p.startswith('B-'):
                 if word != "":
-                    #说明上一个单词已经是一个完整的词了, 加到词表，然后重置
+                    # 说明上一个单词已经是一个完整的词了, 加到词表，然后重置
                     words.append(word)
                     word = ""
                 word += content[idx]
             elif p.startswith('I-'):
                 word += content[idx]
             else:
-                #如果单词存在，那么加到词语表里面
+                # 如果单词存在，那么加到词语表里面
                 if word:
                     words.append(word)
                     word = ""
         print("真实的词:", words)
-        results.append({'content':con, "words":words, "predict":pre})
+        results.append({'content': con, "words": words, "predict": pre})
     if save_excel:
         import pandas as pd
         df = pd.DataFrame(results)
         writer = pd.ExcelWriter(save_excel)
         df.to_excel(writer)
         writer.save()
+
 
 if __name__ == '__main__':
     data_bundle = load_data()
